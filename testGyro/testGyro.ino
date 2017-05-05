@@ -288,12 +288,25 @@ void setGyroSensitivity2000(void)
 }
 
 int gyroReadI2C (byte regAddr) {
+  int value, out=0;
   Wire.beginTransmission(gyroI2CAddr);
   Wire.write(regAddr);
   Wire.endTransmission();
   Wire.requestFrom(gyroI2CAddr, 1);
-  while(!Wire.available()) {};
-  return (Wire.read());
+  while((!Wire.available())&&(out<200)) { 
+      out++;
+      Serial.println("nao conectou");
+      // waiting
+  }
+  if(out<200){  
+      value = Wire.read();
+  }
+  else{
+      //tempo de agr
+      ///variacao -> quanto tempo ficou perdido-> uma relacao (media) com o giro -> soma com o valor do ultimo angulo
+      value = gyroReadI2C(regAddr);
+  }
+  return value;
 }
 
 int gyroWriteI2C( byte regAddr, byte val){
